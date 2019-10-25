@@ -1,32 +1,34 @@
 # Commander
 Commander models application actions as first class objects\.
 
-Every action is implemented as separate command class \(subclass of `CmdCommand`\) with `#execute` method and all state required for execution\.
+Every type of action is implemented as a separate command class \(subclass of `CmdCommand`\) with an `#execute` method and all state required for execution\.
 
 Commands are reusable objects and applications provide various ways to access them (shortcuts, context menu, buttons, etc.)\.
 This information is attached to command classes as activation strategies\. Currently there are three types of activations:
 
-- `CmdShortcutCommandActivation`
-- `CmdContextMenuCommandActivation`
-- `CmdDragAndDropCommandActivation`
+- `CmdShortcutActivation`
+- `CmdContextMenuActivation`
+- `CmdDragAndDropActivation`
 
-Strategies annotate command as class annotations. Look at project [ClassAnnotation](https://github.com/dionisiydk/ClassAnnotation) for details. For example following method will allow `RenamePackageCommand` to be executed by shortcut in possible system browser:
+Strategies are specified as class annotations. Check out the [ClassAnnotation](https://github.com/dionisiydk/ClassAnnotation) project for details. Here are two examples:
+
+The following method will allow `RenamePackageCommand` to be executed by shortcut in the system browser:
 ```Smalltalk
 RenamePackageCommand class>>packageBrowserShortcutActivation
     <classAnnotation>
-    ^CmdShortcutCommandActivation by: $r meta for: PackageBrowserContext
+    ^ CmdShortcutActivation by: $r meta for: ClyPackageContextOfFullBrowser
 ```
 And for context menu:
 ```Smalltalk
 RenamePackageCommand class>>packageBrowserMenuActivation
     <classAnnotation>
-    ^CmdContextMenuCommandActivation byRootGroupItemFor: PackageBrowserContext
+    ^ CmdContextMenuActivation byRootGroupItemFor: ClyPackageContextOfFullBrowser
 ```
-Activation strategies are always created with application context where they can be applied \(`PackageBrowserContext` in the example\)\.
-Application should provide such contexts as subclasses of `CmdToolContext` with information about application state\.
-Every widget can bring own context to interact with application as separate tool\.
-For example system browser shows multiple panes which provide package context, class context and method context\.
-And depending on the context the browser shows different menu and provides different shortcuts\.
+An activation strategy should always include an application context where it can be applied \(`ClyPackageContextOfFullBrowser` in the example\)\.
+The application to be extended should provide such contexts as subclasses of `CmdToolContext` with information about application state\. Browse the hierarchy of `CmdToolContext` subclasses for examples in the image.
+Every widget can provide its own context to interact with the application as a separate tool\.
+For example, the system browser shows multiple panes which provide a package context, class context and method context\.
+For each context, the browser can show a different menu and provide different shortcuts\.
 
 ## Installation
 ```Smalltalk
@@ -41,4 +43,3 @@ spec
     baseline: 'Commander'
     with: [ spec repository: 'github://dionisiydk/Commander:v0.3.x' ]
 ```
-
